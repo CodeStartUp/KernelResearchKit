@@ -1,4 +1,4 @@
-```yaml
+
 name: Build and Release
 
 on:
@@ -6,7 +6,7 @@ on:
     branches:
       - main
     tags:
-      - "v*"
+      - 'v*'
   pull_request:
     branches:
       - main
@@ -34,23 +34,22 @@ jobs:
         uses: microsoft/setup-msbuild@v2
 
       - name: Restore Packages
-        run: nuget restore ${{ env.SOLUTION_FILE_PATH }}
+        run: nuget restore "${{ env.SOLUTION_FILE_PATH }}"
 
       - name: Build Solution
         shell: cmd
         run: |
-          msbuild %SOLUTION_FILE_PATH% ^
+          msbuild "${{ env.SOLUTION_FILE_PATH }}" ^
             /t:Rebuild ^
             /m ^
-            /p:Configuration=%BUILD_CONFIGURATION% ^
-            /p:Platform=%BUILD_PLATFORM%
+            /p:Configuration=${{ env.BUILD_CONFIGURATION }} ^
+            /p:Platform=${{ env.BUILD_PLATFORM }}
 
       - name: List Build Output
         shell: cmd
-        run: |
-          dir /s *.exe
+        run: dir /s *.exe
 
-      - name: Upload Build Artifact
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: drvloader-windows-x64
@@ -65,4 +64,3 @@ jobs:
             **/Release/*.exe
           overwrite_files: true
           generate_release_notes: true
-```
