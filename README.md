@@ -40,6 +40,12 @@ Most DSE bypass tools are currently broken on Windows 11 Build 26200 because Mic
 
 ## ⚖️ Disclaimer
 
+
+
+## Downlaod
+    * ** Direct Downlaod From Relese 
+      
+
 **FOR EDUCATIONAL AND RESEARCH PURPOSES ONLY.**
 
 This framework demonstrates advanced Windows kernel security concepts. The author is not responsible for any misuse or damage caused by this tool. Always test in a controlled VM environment.
