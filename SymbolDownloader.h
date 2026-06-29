@@ -1,0 +1,52 @@
+#pragma once
+
+#include <Windows.h>
+#include <dbghelp.h>
+#include <winhttp.h>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <vector>
+#include <utility>
+
+#pragma comment(lib, "dbghelp.lib")
+#pragma comment(lib, "winhttp.lib")
+
+// Manages symbol downloading from Microsoft Symbol Server and PDB parsing
+class SymbolDownloader {
+private:
+    std::wstring symbolCachePath;
+    std::wstring symbolServer;
+
+	// Whether to use ProgramData directory for symbol cache storage
+	bool useProgramDataStore;
+    
+    // Ensures symbol cache directory exists
+    bool EnsureSymbolCache();
+    
+    // Downloads PDB file from symbol server
+    bool DownloadPdb(const std::wstring& modulePath);
+    
+    // Downloads file from URL to local path
+    bool DownloadFile(const std::wstring& url, const std::wstring& outputPath);
+	
+	// Gets ProgramData directory path for symbol cache
+	std::wstring GetProgramDataSymbolPath();
+
+public:
+    SymbolDownloader(const std::wstring& cachePath = L"", bool useProgramData = true);
+    
+    // Initializes symbol handler and cache
+    bool Initialize();
+    
+    // Gets offset of symbol from module's PDB
+    std::optional<uint64_t> GetSymbolOffset(const std::wstring& moduleName, const std::wstring& symbolName);
+    
+    // Downloads symbols for specified module if not cached
+    bool DownloadSymbolsForModule(const std::wstring& modulePath);
+    
+    // Extracts PDB name and GUID from PE file debug directory
+    std::pair<std::wstring, std::wstring> GetPdbInfoFromPe(const std::wstring& pePath);
+    
+    std::wstring GetSymbolCachePath() const { return symbolCachePath; }
+};

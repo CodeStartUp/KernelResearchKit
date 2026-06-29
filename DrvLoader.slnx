@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Release" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="DrvLoader.vcxproj" Id="a905154d-f1ec-4821-9717-9f6d35f69f3f" />
+</Solution>
