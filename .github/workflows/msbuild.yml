@@ -6,7 +6,7 @@ on:
     branches:
       - main
     tags:
-      - 'v*'
+      - "v*"
   pull_request:
     branches:
       - main
@@ -24,8 +24,10 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup NuGet
         uses: NuGet/setup-nuget@v2
@@ -36,7 +38,7 @@ jobs:
       - name: Restore Packages
         run: nuget restore "${{ env.SOLUTION_FILE_PATH }}"
 
-      - name: Build Solution
+      - name: Build
         shell: cmd
         run: |
           msbuild "${{ env.SOLUTION_FILE_PATH }}" ^
@@ -45,22 +47,37 @@ jobs:
             /p:Configuration=${{ env.BUILD_CONFIGURATION }} ^
             /p:Platform=${{ env.BUILD_PLATFORM }}
 
-      - name: List Build Output
+      - name: Verify executable exists
         shell: cmd
         run: dir /s *.exe
 
-      - name: Upload Artifact
+      - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
           name: drvloader-windows-x64
           path: |
-            **/Release/*.exe
+            bin/x64/Release/drvloader.exe
 
-      - name: Create GitHub Release
-        if: startsWith(github.ref, 'refs/tags/')
+      # Update "Latest" release after every push to main
+      - name: Update Latest Release
+        if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            **/Release/*.exe
-          overwrite_files: true
+          tag_name: latest
+          name: Latest Build
+          prerelease: true
+          make_latest: false
           generate_release_notes: true
+          files: |
+            bin/x64/Release/drvloader.exe
+          overwrite_files: true
+
+      # Create versioned releases only when pushing tags like v1.0.0
+      - name: Create Version Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            bin/x64/Release/drvloader.exe
+          overwrite_files: true
